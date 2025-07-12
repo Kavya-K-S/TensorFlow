@@ -1,0 +1,12 @@
+import tensorflow as tf
+a = tf.constant([[1, 2], [3, 4]])
+b = tf.constant([[5, 6], [7, 8]])
+ad = tf.add(a, b)
+s = tf.subtract(a, b)
+m = tf.multiply(a, b)
+d = tf.divide(a, b)
+
+print("Addition:\n", ad.numpy())
+print("Subtraction:\n", s.numpy())
+print("Multiplication:\n", m.numpy())
+print("Division:\n", d.numpy())
