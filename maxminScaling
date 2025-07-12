@@ -1,0 +1,7 @@
+import tensorflow as tf
+tensor = tf.constant([[2.0, 4.0], [6.0, 10.0]])
+min_val = tf.reduce_min(tensor)
+max_val = tf.reduce_max(tensor)
+normalized_tensor = (tensor - min_val) / (max_val - min_val)
+print("Original Tensor:\n", tensor.numpy())
+print("Normalized Tensor:\n", normalized_tensor.numpy())
