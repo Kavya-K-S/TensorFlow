@@ -1,0 +1,53 @@
+import tensorflow as tf
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+#1.laod iris dataset
+iris=load_iris()
+X=iris.data
+y=iris.target.reshape(-1,1)
+
+
+#2. one-hot encode the target labels
+encoder=OneHotEncoder(sparse_output=False)
+y_encoded=encoder.fit_transform(y)
+
+#3. Feature scaling
+scalar=StandardScaler()
+X_scaled=scalar.fit_transform(X)
+
+#4. split into training and test sets
+X_train, X_test,y_train,y_test=train_test_split(X_scaled, y_encoded, test_size=0.2,random_state=42)
+
+#5. Convert to tf.data.Dataset
+batch_size=16
+train_dataset=tf.data.Dataset.from_tensor_slices((X_train,y_train))
+train_dataset=train_dataset.shuffle(buffer_size=100).batch(batch_size).prefetch(tf.data.AUTOTUNE)
+test_dataset=tf.data.Dataset.from_tensor_slices((X_test,y_test))
+test_dataset=test_dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
+
+#6.build the model
+model=tf.keras.Sequential([tf.keras.layers.Dense(10,activation='relu',input_shape=(4,)),tf.keras.layers.Dense(8,activation='relu'),tf.keras.layers.Dense(3,activation='softmax')])
+
+#7. Compilr yhr model
+model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
+
+#8. Train the model
+model.fit(train_dataset,epochs=50,validation_data=test_dataset)
+
+#9.Evaluate the model
+loss,accuracy=model.evaluate(test_dataset)
+print(f"\nTest Accuracy: {accuracy*100:.2f}")
+
+#10. predict
+predictions=model.predict(X_test)
+predicted_classes=np.argmax(predictions,axis=1)
+true_classes=np.argmax(y_test,axis=1)
+
+#11. COmpare (first 10 predictions)
+print("\n True vs predicted (first 10): ")
+for i in range(10):
+  print(f"True: {true_classes[i]},predicted: {predicted_classes[i]}")
+
